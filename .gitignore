@@ -1,0 +1,16 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Dependencies / build (none currently, but reserved)
+# NOTE: only the project root vendor/ is ignored — the bundled
+# lib/plugin-update-checker/vendor/ MUST be committed so updates work.
+node_modules/
+/vendor/
+
+# Local env
+*.log
+.env
