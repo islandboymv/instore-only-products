@@ -1,11 +1,11 @@
 === In-Store Only Products ===
 Contributors: islandboy
 Requires at least: 6.0
-Tested up to: 6.7
+Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 10.7
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 
 Mark WooCommerce products as available in your physical shop only — shown online
@@ -35,6 +35,9 @@ Features:
 4. Update.
 
 == Changelog ==
+
+= 1.0.1 =
+* Mark as tested up to WordPress 7.0.
 
 = 1.0.0 =
 * Initial release as a standalone, self-updating plugin (converted from an mu-plugin).
