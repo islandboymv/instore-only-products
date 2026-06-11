@@ -7,7 +7,7 @@
  *              button is replaced with a polite in-store notice. Each product can optionally override
  *              the default heading/message. Self-updates from GitHub Releases.
  * Author:      Islandboy
- * Version:     1.0.3
+ * Version:     1.0.4
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * WC requires at least: 7.0
@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'INSTORE_ONLY_VERSION', '1.0.3' );
-define( 'INSTORE_ONLY_TELEMETRY_URL', 'https://mgga-shop.islandboy.xyz/wp-json/telemetry/v1/ping' );
+define( 'INSTORE_ONLY_VERSION', '1.0.4' );
+define( 'INSTORE_ONLY_TELEMETRY_URL', 'https://plugin-telemetry.islandboy.workers.dev/ping' );
 
 /**
  * Declare WooCommerce feature compatibility. This plugin only touches products

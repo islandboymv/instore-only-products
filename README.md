@@ -1,6 +1,6 @@
 # In-Store Only Products
 
-[![Active installs](https://img.shields.io/endpoint?url=https%3A%2F%2Fmgga-shop.islandboy.xyz%2Fwp-json%2Ftelemetry%2Fv1%2Fbadge%2Finstore-only-products)](https://github.com/islandboymv/instore-only-products)
+[![Active installs](https://img.shields.io/endpoint?url=https%3A%2F%2Fplugin-telemetry.islandboy.workers.dev%2Fbadge%2Finstore-only-products)](https://github.com/islandboymv/instore-only-products)
 [![Latest release](https://img.shields.io/github/v/release/islandboymv/instore-only-products)](https://github.com/islandboymv/instore-only-products/releases)
 
 A small WooCommerce plugin that marks products as **available in your physical shop only**. They still appear online with price and stock status, but can't be bought online — the Add to Cart button is replaced with a polite in-store notice.
