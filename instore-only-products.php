@@ -7,7 +7,7 @@
  *              button is replaced with a polite in-store notice. Each product can optionally override
  *              the default heading/message. Self-updates from GitHub Releases.
  * Author:      Islandboy
- * Version:     1.0.2
+ * Version:     1.0.3
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * WC requires at least: 7.0
@@ -19,6 +19,9 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+define( 'INSTORE_ONLY_VERSION', '1.0.3' );
+define( 'INSTORE_ONLY_TELEMETRY_URL', 'https://mgga-shop.islandboy.xyz/wp-json/telemetry/v1/ping' );
 
 /**
  * Declare WooCommerce feature compatibility. This plugin only touches products
@@ -46,6 +49,53 @@ add_action( 'plugins_loaded', function () {
 		__FILE__,
 		'instore-only-products'
 	);
+} );
+
+/* ---------------------------------------------------------------------------
+ * Anonymous active-install telemetry.
+ *
+ * Sends a daily ping containing ONLY the plugin slug, a one-way SHA-256 hash of
+ * the site URL (never the URL itself), and the version — so the central server can
+ * show an "active installs" count. It cannot identify your site.
+ *
+ * Opt out entirely with:
+ *   add_filter( 'instore_only_telemetry_enabled', '__return_false' );
+ * ------------------------------------------------------------------------- */
+add_action( 'init', function () {
+	if ( ! wp_next_scheduled( 'instore_only_telemetry_ping' ) ) {
+		wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'instore_only_telemetry_ping' );
+	}
+} );
+
+add_action( 'instore_only_telemetry_ping', 'instore_only_send_telemetry' );
+
+function instore_only_send_telemetry() {
+	if ( ! apply_filters( 'instore_only_telemetry_enabled', true ) ) {
+		return;
+	}
+	$home = home_url();
+	foreach ( array( 'localhost', '127.0.0.1', '.test', '.local', '.localhost', '.example' ) as $needle ) {
+		if ( false !== strpos( $home, $needle ) ) {
+			return; // don't count local/dev sites
+		}
+	}
+	wp_remote_post( INSTORE_ONLY_TELEMETRY_URL, array(
+		'timeout'  => 5,
+		'blocking' => false,
+		'headers'  => array( 'Content-Type' => 'application/json' ),
+		'body'     => wp_json_encode( array(
+			'slug'    => 'instore-only-products',
+			'site'    => hash( 'sha256', $home ),
+			'version' => INSTORE_ONLY_VERSION,
+		) ),
+	) );
+}
+
+register_activation_hook( __FILE__, function () {
+	wp_schedule_single_event( time() + 30, 'instore_only_telemetry_ping' );
+} );
+register_deactivation_hook( __FILE__, function () {
+	wp_clear_scheduled_hook( 'instore_only_telemetry_ping' );
 } );
 
 const INSTORE_META_KEY     = '_instore_only';
