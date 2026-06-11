@@ -7,7 +7,7 @@
  *              button is replaced with a polite in-store notice. Each product can optionally override
  *              the default heading/message. Self-updates from GitHub Releases.
  * Author:      Islandboy
- * Version:     1.0.1
+ * Version:     1.0.2
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * WC requires at least: 7.0
@@ -19,6 +19,17 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/**
+ * Declare WooCommerce feature compatibility. This plugin only touches products
+ * (never orders), so it is fully compatible with HPOS and the Cart/Checkout blocks.
+ */
+add_action( 'before_woocommerce_init', function () {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
+	}
+} );
 
 /**
  * GitHub-powered automatic updates.

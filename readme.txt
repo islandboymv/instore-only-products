@@ -5,7 +5,7 @@ Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 10.7
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 
 Mark WooCommerce products as available in your physical shop only — shown online
@@ -35,6 +35,10 @@ Features:
 4. Update.
 
 == Changelog ==
+
+= 1.0.2 =
+* Declare HPOS and Cart/Checkout Blocks compatibility (clears the WooCommerce
+  feature-compatibility notice). This plugin only touches products, not orders.
 
 = 1.0.1 =
 * Mark as tested up to WordPress 7.0.
