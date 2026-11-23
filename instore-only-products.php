@@ -7,7 +7,7 @@
  *              button is replaced with a polite in-store notice. Each product can optionally override
  *              the default heading/message. Self-updates from GitHub Releases.
  * Author:      Islandboy
- * Version:     1.0.4
+ * Version:     1.0.6
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * WC requires at least: 7.0
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'INSTORE_ONLY_VERSION', '1.0.4' );
+define( 'INSTORE_ONLY_VERSION', '1.0.6' );
 define( 'INSTORE_ONLY_TELEMETRY_URL', 'https://plugin-telemetry.islandboy.workers.dev/ping' );
 
 /**
@@ -196,9 +196,58 @@ add_filter( 'woocommerce_is_purchasable', function ( $purchasable, $product ) {
  */
 add_action( 'woocommerce_single_product_summary', function () {
 	global $product;
-	if ( instore_only_is_flagged( $product ) ) {
-		remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+	if ( ! instore_only_is_flagged( $product ) ) {
+		return;
+	}
+
+	remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+
+	// Blocksy has its own slot action (see instore_only_render_notice_in_slot),
+	// which renders the notice in the right place. Only fall back to the summary
+	// hook on themes that don't provide it.
+	if ( ! function_exists( 'blocksy_html_tag' ) ) {
 		add_action( 'woocommerce_single_product_summary', 'instore_only_render_notice', 30 );
+	}
+}, 1 );
+
+/**
+ * Blocksy does not render the product summary through the standard
+ * woocommerce_single_product_summary priorities — it walks its own layout array
+ * and calls woocommerce_template_single_add_to_cart() directly, firing the summary
+ * hook only after all of its own layers. Hooking the summary therefore drops the
+ * notice at the very bottom of the column, below the SKU/category meta and the
+ * share icons, instead of where the button was.
+ *
+ * Worse, the layout brackets the add-to-cart slot with a divider on each side. With
+ * the button suppressed the slot collapses to zero height and the two dividers
+ * render as a pair of blank horizontal rules.
+ *
+ * Blocksy's own slot action fires between those dividers, so rendering there both
+ * puts the notice where the button would be and gives the dividers real content to
+ * bracket. Registered unconditionally at load: the flag is checked at render time
+ * because this action fires before the summary-hook callback above can run.
+ */
+add_action( 'blocksy:woocommerce:product-single:add_to_cart:after', 'instore_only_render_notice_in_slot' );
+
+function instore_only_render_notice_in_slot() {
+	global $product;
+
+	if ( instore_only_is_flagged( $product ) ) {
+		instore_only_render_notice();
+	}
+}
+
+/**
+ * Variable products: Blocksy calls woocommerce_template_single_add_to_cart()
+ * directly, and unlike simple.php the variable template renders the form whether
+ * or not the product is purchasable. Keep the option picker (customers can still
+ * browse each variation's photo and price) but drop the quantity + Add to Cart
+ * block. Purchase is already refused server-side by the is_purchasable filter.
+ */
+add_action( 'woocommerce_single_variation', function () {
+	global $product;
+	if ( instore_only_is_flagged( $product ) ) {
+		remove_action( 'woocommerce_single_variation', 'woocommerce_single_variation_add_to_cart_button', 20 );
 	}
 }, 1 );
 
